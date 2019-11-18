@@ -10,9 +10,9 @@ from map import Map
 
 class MCL:
     def __init__(self, num_particles=100):
-        self.measurement_sigma = 20
-        self.movement_sigma = 20
-        self.delta = 5  # distortion coeff
+        self.measurement_sigma = 1
+        self.movement_sigma = 1
+        self.delta = 2  # distortion coeff
         self.num_particles = num_particles
 
         self.particles = []
@@ -38,7 +38,7 @@ class MCL:
 
     def motion_update(self, movement_distance):
         for particle in self.particles:
-            particle.location += self.motion_model(movement_distance)
+            particle.location += int(self.motion_model(movement_distance))
             if particle.location > self.map.length:
                 particle.location = self.map.length
             # elif particle.location < 0:
@@ -53,7 +53,7 @@ class MCL:
         for particle in self.particles:
             location += particle.location * particle.belief
             belief += particle.belief
-        self.pose.location = location / self.num_particles
+        self.pose.location = int(location / self.num_particles)
         self.pose.belief = belief / self.num_particles
 
     def resample(self):
@@ -66,7 +66,7 @@ class MCL:
         for particle in self.particles:
             if particle.belief > avg_belief:    # if it deserves, generate a clone with random distortion
                 temp = particle
-                temp.location += int(self.delta * random.random)    # distortion
+                temp.location += int(self.delta * random.random())    # distortion
                 if temp.location > self.map.length:
                     temp.location = self.map.length
                 resampled.append(temp)

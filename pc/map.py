@@ -8,15 +8,15 @@
 '''
 class Map:
     def __init__(self):
-        self.near = 200
-        self.moderate = 400
-        self.far = 600
-        self.length = 2000
+        self.near = 20
+        self.moderate = 40
+        self.far = 60
+        self.length = 200
 
     '''
         The map can be depicted as follows:
 
-         ||       (Finish: 2000)
+         ||       (Finish: 200)
 MODERATE ||    
          ||
     ||
@@ -33,13 +33,13 @@ NEAR         ||
              ||  R (Start: 0)
     '''
     def expected_sonar_reading(self, location):
-        if 0 <= location < 300:
+        if 0 <= location < 30:
             return self.near
-        elif 300 <= location < 1000:
+        elif 30 <= location < 100:
             return self.far
-        elif 1000 <= location < 1400:
+        elif 100 <= location < 140:
             return self.moderate
-        elif 1400 <= location < 1700:
+        elif 140 <= location < 170:
             return self.far
         else:
             return self.moderate
