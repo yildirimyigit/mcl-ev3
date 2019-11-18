@@ -9,9 +9,11 @@ from particle import Particle
 from map import Map
 
 class MCL:
-    def __init__(self, world_length=2000, num_particles=50):
+    def __init__(self, num_particles=100):
         self.measurement_sigma = 20
         self.movement_sigma = 20
+        self.delta = 5  # distortion coeff
+        self.num_particles = num_particles
 
         self.particles = []
         for _ in range(num_particles):
@@ -21,34 +23,73 @@ class MCL:
         self.map = Map()
         self.reset()
 
-    def measurement_model(self, sonar_reading, location):
+    def measurement_model(self, current_sonar_reading, location):
         expected_sonar_reading = self.map.expected_sonar_reading(location)
-        prob = gaussian(sonar_reading, expected_sonar_reading, self.measurement_sigma)
+        prob = gaussian(current_sonar_reading, expected_sonar_reading, self.measurement_sigma)
         return prob
 
     def motion_model(self, movement_distance):
         return random.normalvariate(movement_distance, self.movement_sigma)
 
-    def measurement_update(self):
-        pass
+    def measurement_update(self, current_sonar_reading):
+        for particle in self.particles:
+            particle.belief = self.measurement_model(current_sonar_reading, particle.location)
+        self.resample()
 
-    def motion_update(self):
-        pass
+    def motion_update(self, movement_distance):
+        for particle in self.particles:
+            particle.location += self.motion_model(movement_distance)
+            if particle.location > self.map.length:
+                particle.location = self.map.length
+            # elif particle.location < 0:
+            #     particle.location = 0
 
+    '''
+        Calculate and return the average location and belief as the position estimation
+    '''
     def calculatePose(self):
-        pass
+        location = 0
+        belief = 0
+        for particle in self.particles:
+            location += particle.location * particle.belief
+            belief += particle.belief
+        self.pose.location = location / self.num_particles
+        self.pose.belief = belief / self.num_particles
 
     def resample(self):
-        pass
+        resampled = []
+        sum_belief = 0
+        for particle in self.particles:
+            sum_belief += particle.belief
+
+        avg_belief = sum_belief/self.num_particles
+        for particle in self.particles:
+            if particle.belief > avg_belief:    # if it deserves, generate a clone with random distortion
+                temp = particle
+                temp.location += int(self.delta * random.random)    # distortion
+                if temp.location > self.map.length:
+                    temp.location = self.map.length
+                resampled.append(temp)
+
+        for i in range(self.num_particles):
+            if i < len(resampled):  # copy the resampled ones
+                self.particles[i] = resampled[i]
+            else:   # fill the list with random particles
+                temp = Particle()
+                self.particles[i] = self.reset_individual(temp)
 
     '''
-        Resets all particles with random locations and same belief
+        Reset all particles with random locations and same belief
     '''
     def reset(self):
-        bel_reset = 1/len(self.particles)  # belief of an individual
         for particle in self.particles:
-            particle.location = random.randrange(2000)
-            particle.belief = bel_reset
+            particle = self.reset_individual(particle)
+
+    def reset_individual(self, particle):
+        particle.location = random.randrange(self.map.length)
+        particle.belief = 1/self.num_particles
+        return particle
+
 
 '''
     Value of a variable under gaussian distribution

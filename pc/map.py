@@ -11,6 +11,7 @@ class Map:
         self.near = 200
         self.moderate = 400
         self.far = 600
+        self.length = 2000
 
     '''
         The map can be depicted as follows:
@@ -18,15 +19,15 @@ class Map:
          ||       (Finish: 2000)
 MODERATE ||    
          ||
-
-FAR
-
+    ||
+FAR ||
+    ||
          ||
 MODERATE ||
          ||
-
-FAR
-
+    ||
+FAR ||
+    ||
              ||
 NEAR         ||
              ||  R (Start: 0)
