@@ -2,11 +2,13 @@
     Author: yigit.yildirim@boun.edu.tr
 '''
 
+import sys
+import time
+
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5 import QtGui
 from PyQt5.QtGui import QPainter
 from PyQt5.QtCore import Qt
-import sys, time
 
 from mcl import MCL
 

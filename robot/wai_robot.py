@@ -28,7 +28,17 @@ class WhereAmI:
 
         self.us = UltrasonicSensor()
     def run(self):
-        print('RUNNING...')
+        try:
+            client, address = s.accept()
+            while 1:
+                data = client.recv(size)
+                if data:
+                    print(data)
+                    client.send(data)
+        except:	
+            print("Closing socket")	
+            client.close()
+            s.close()
 
 
 if __name__ == "__main__":
